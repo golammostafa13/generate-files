@@ -1,191 +1,28 @@
-import React from "react";
+import React, { useRef } from "react";
 import "./App.css";
 import MaterialTable from "material-table";
 import XLSX from "xlsx";
 import PrintIcon from "@material-ui/icons/Print";
-import GetAppOutlinedIcon from "@material-ui/icons/GetAppOutlined";
+import GridOnIcon from "@material-ui/icons/GridOn";
+import PictureAsPdfIcon from "@material-ui/icons/PictureAsPdf";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-const studentData = [
-  {
-    id: 1,
-    name: "Neeraj",
-    email: "neeraj@gmail.com",
-    year: 2015,
-    fee: 167000,
-  },
-  {
-    id: 2,
-    name: "Vikas",
-    email: "vikas@gmail.com",
-    year: 2013,
-    fee: 785462,
-  },
+import { data1, data2 } from "./utils";
+import Letter from "./Letter";
+import { useReactToPrint } from "react-to-print";
+import { Divider } from "@material-ui/core";
 
-  {
-    id: 3,
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    year: 2020,
-    fee: 784596,
-  },
-  {
-    id: 4,
-    name: "Neeraj",
-    email: "neeraj@gmail.com",
-    year: 2015,
-    fee: 167000,
-  },
-  {
-    id: 5,
-    name: "Vikas",
-    email: "vikas@gmail.com",
-    year: 2013,
-    fee: 785462,
-  },
-
-  {
-    id: 6,
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    year: 2020,
-    fee: 784596,
-  },
-  {
-    id: 7,
-    name: "Neeraj",
-    email: "neeraj@gmail.com",
-    year: 2015,
-    fee: 167000,
-  },
-  {
-    id: 8,
-    name: "Vikas",
-    email: "vikas@gmail.com",
-    year: 2013,
-    fee: 785462,
-  },
-
-  {
-    id: 9,
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    year: 2020,
-    fee: 784596,
-  },
-  {
-    id: 10,
-    name: "Neeraj",
-    email: "neeraj@gmail.com",
-    year: 2015,
-    fee: 167000,
-  },
-  {
-    id: 11,
-    name: "Vikas",
-    email: "vikas@gmail.com",
-    year: 2013,
-    fee: 785462,
-  },
-
-  {
-    id: 12,
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    year: 2020,
-    fee: 784596,
-  },
-  {
-    id: 13,
-    name: "Neeraj",
-    email: "neeraj@gmail.com",
-    year: 2015,
-    fee: 167000,
-  },
-  {
-    id: 14,
-    name: "Vikas",
-    email: "vikas@gmail.com",
-    year: 2013,
-    fee: 785462,
-  },
-
-  {
-    id: 15,
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    year: 2020,
-    fee: 784596,
-  },
-  {
-    id: 16,
-    name: "Neeraj",
-    email: "neeraj@gmail.com",
-    year: 2015,
-    fee: 167000,
-  },
-  {
-    id: 17,
-    name: "Vikas",
-    email: "vikas@gmail.com",
-    year: 2013,
-    fee: 785462,
-  },
-
-  {
-    id: 18,
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    year: 2020,
-    fee: 784596,
-  },
-  {
-    id: 19,
-    name: "Neeraj",
-    email: "neeraj@gmail.com",
-    year: 2015,
-    fee: 167000,
-  },
-  {
-    id: 20,
-    name: "Vikas",
-    email: "vikas@gmail.com",
-    year: 2013,
-    fee: 785462,
-  },
-
-  {
-    id: 21,
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    year: 2020,
-    fee: 784596,
-  },
-  {
-    id: 22,
-    name: "Neeraj",
-    email: "neeraj@gmail.com",
-    year: 2015,
-    fee: 167000,
-  },
-  {
-    id: 23,
-    name: "Vikas",
-    email: "vikas@gmail.com",
-    year: 2013,
-    fee: 785462,
-  },
-
-  {
-    id: 24,
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    year: 2020,
-    fee: 784596,
-  },
-];
 function App() {
-  const columns = [
+  const componentRef = useRef(null);
+  const generatePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+
+  const columns1 = [
+    { title: "Name", field: "name" },
+    { title: "Email", field: "email" },
+  ];
+  const columns2 = [
     { title: "Name", field: "name" },
     { title: "Email", field: "email" },
     { title: "Year", field: "year", type: "numeric" },
@@ -193,34 +30,56 @@ function App() {
   ];
 
   const downloadExcel = () => {
-    const newData = studentData.map((row) => {
+    const newData = data2.map((row) => {
       delete row.tableData;
       return row;
     });
     const workSheet = XLSX.utils.json_to_sheet(newData);
     const workBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workBook, workSheet, "students");
-    //Buffer
+    XLSX.utils.book_append_sheet(workBook, workSheet, "report");
     XLSX.write(workBook, { bookType: "xlsx", type: "buffer" });
-    //Binary string
     XLSX.write(workBook, { bookType: "xlsx", type: "binary" });
-    //Download
     XLSX.writeFile(workBook, "ReportSheet.xlsx");
   };
 
   const downloadPdf = () => {
+    const totalPagesExp = "{total_pages_count_string}";
     const doc = new jsPDF();
-    doc.text("Student Details", 20, 10);
+    doc.page = 1;
+    doc.text("Report", 15, 10);
     doc.autoTable({
       theme: "grid",
-      columns: columns.map((col) => ({ ...col, dataKey: col.field })),
-      body: studentData,
+      headStyles: { fontSize: 10 },
+      bodyStyles: { fontSize: 8, fontStyle: "italic" },
+
+      columns: columns1.map((col) => ({ ...col, dataKey: col.field })),
+      body: data1,
     });
+    doc.autoTable({
+      theme: "grid",
+      columns: columns2.map((col) => ({ ...col, dataKey: col.field })),
+      body: data2,
+      addPageContent: (data) => {
+        let footerStr = "Page " + doc.internal.getNumberOfPages();
+        if (typeof doc.putTotalPages === "function") {
+          footerStr = footerStr + " of " + totalPagesExp;
+        }
+        doc.setFontSize(10);
+        doc.text(
+          footerStr,
+          data.settings.margin.left,
+          doc.internal.pageSize.height - 10
+        );
+      },
+    });
+    if (typeof doc.putTotalPages === "function") {
+      doc.putTotalPages(totalPagesExp);
+    }
     doc.save("ReportTable.pdf");
   };
 
   // const dowloadDoc = () => {
-  //   const doc = new 
+  //   const doc = new
   // };
 
   return (
@@ -228,24 +87,24 @@ function App() {
       <h1 align="center">React-App</h1>
       <h4 align="center">Export Data to Pdf in Material Table</h4>
       <MaterialTable
-        title="Student Details"
-        columns={columns}
-        data={studentData}
+        title="Report"
+        columns={columns1}
+        data={data1}
         actions={[
           {
             icon: () => (
               <button style={{ cursor: "pointer" }}>
-                Export Excel <GetAppOutlinedIcon />
+                Export Excel <GridOnIcon />
               </button>
             ),
-            tooltip: "Export to Excel",
+            tooltip: "Excel",
             onClick: () => downloadExcel(),
             isFreeAction: true,
           },
           {
             icon: () => (
               <button style={{ cursor: "pointer" }}>
-                Export PDF <PrintIcon />
+                PDF <PictureAsPdfIcon />
               </button>
             ),
             tooltip: "Export to Pdf",
@@ -254,6 +113,52 @@ function App() {
           },
         ]}
       />
+      <Divider />
+      <MaterialTable
+        title="Report"
+        columns={columns2}
+        data={data2}
+        // actions={[
+        //   {
+        //     icon: () => (
+        //       <button style={{ cursor: "pointer" }}>
+        //         Export Excel <GridOnIcon />
+        //       </button>
+        //     ),
+        //     tooltip: "Excel",
+        //     onClick: () => downloadExcel(),
+        //     isFreeAction: true,
+        //   },
+        //   {
+        //     icon: () => (
+        //       <button style={{ cursor: "pointer" }}>
+        //         PDF <PictureAsPdfIcon />
+        //       </button>
+        //     ),
+        //     tooltip: "Export to Pdf",
+        //     onClick: () => downloadPdf(),
+        //     isFreeAction: true,
+        //   },
+        // {
+        //   icon: () => (
+        //     <button style={{ cursor: "pointer" }}>
+        //       Print <PrintIcon />
+        //     </button>
+        //   ),
+        //   tooltip: "Print",
+        //   onClick: () => generatePrint(),
+        //   isFreeAction: true,
+        // },
+        // ]}
+      />
+      <Letter componentRef={componentRef} />
+
+      <button
+        style={{ cursor: "pointer", margin: "0 auto" }}
+        onClick={generatePrint}
+      >
+        Print Invoice <PrintIcon />
+      </button>
     </div>
   );
 }
