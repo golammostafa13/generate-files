@@ -1,3 +1,16 @@
+export const data1 = [
+  {
+    id: 1,
+    name: "Devonna",
+    email: "dwhieldon0@senate.gov",
+  },
+  {
+    id: 2,
+    name: "Dee dee",
+    email: "dellington1@bloglines.com",
+  },
+];
+
 export const data2 = [
   {
     id: 1,
@@ -701,15 +714,13 @@ export const data2 = [
   },
 ];
 
-export const data1 = [
-  {
-    id: 1,
-    name: "Devonna",
-    email: "dwhieldon0@senate.gov",
-  },
-  {
-    id: 2,
-    name: "Dee dee",
-    email: "dellington1@bloglines.com",
-  },
+export const columns1 = [
+  { title: "Name", field: "name" },
+  { title: "Email", field: "email" },
+];
+export const columns2 = [
+  { title: "Name", field: "name" },
+  { title: "Email", field: "email" },
+  { title: "Year", field: "year", type: "numeric" },
+  { title: "Fee", field: "fee", type: "currency" },
 ];

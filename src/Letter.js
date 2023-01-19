@@ -5,7 +5,7 @@ import HeaderInvoice from "./HeaderInvoice";
 const Letter = ({componentRef}) => {
   
   return (
-    <form ref={componentRef}>
+    <form style={{display: 'hidden'}} ref={componentRef}>
       <HeaderInvoice />
       <Article />
     </form>

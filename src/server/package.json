@@ -1,0 +1,22 @@
+{
+    "name": "lws-json-server-videos",
+    "description": "Example in memory videos api with json-server by Learn with Sumit",
+    "version": "1.0.0",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js --no-cors true"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "docx": "^7.8.2",
+        "html-docx-js": "^0.3.1",
+        "json-server": "^0.17.0",
+        "jszip": "^3.10.1",
+        "officegen": "^0.6.5",
+        "puppeteer": "^19.5.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "keywords": [],
+    "author": "Sumit Saha, Learn with Sumit"
+}
