@@ -6,14 +6,18 @@ import PrintIcon from "@material-ui/icons/Print";
 import GridOnIcon from "@material-ui/icons/GridOn";
 import PictureAsPdfIcon from "@material-ui/icons/PictureAsPdf";
 import jsPDF from "jspdf";
-import { data1, data2, columns1, columns2 } from "./utils";
+import {
+  firstTableData,
+  secondTableData,
+  firstTableColumns,
+  secondTableColumns,
+} from "./utils";
 import { Button, Divider } from "@material-ui/core";
 import XlsxPopulate from "xlsx-populate";
 import axios from "axios";
 import autoTable from "jspdf-autotable";
 
 function App() {
-
   const downloadPdf = () => {
     const totalPagesExp = "{total_pages_count_string}";
     const doc = new jsPDF();
@@ -24,13 +28,16 @@ function App() {
       headStyles: { fontSize: 10 },
       bodyStyles: { fontSize: 8, fontStyle: "italic" },
 
-      columns: columns1.map((col) => ({ ...col, dataKey: col.field })),
-      body: data1,
+      columns: firstTableColumns.map((col) => ({ ...col, dataKey: col.field })),
+      body: firstTableData,
     });
     doc.autoTable({
       theme: "grid",
-      columns: columns2.map((col) => ({ ...col, dataKey: col.field })),
-      body: data2,
+      columns: secondTableColumns.map((col) => ({
+        ...col,
+        dataKey: col.field,
+      })),
+      body: secondTableData,
       addPageContent: (data) => {
         let footerStr = "Page " + doc.internal.getNumberOfPages();
         if (typeof doc.putTotalPages === "function") {
@@ -87,7 +94,7 @@ function App() {
   };
 
   const handleExport = () => {
-    let title = [{ A: "Report on Excel Sheet" }].concat("");
+    let title = [{ A: "Excel Sheet 1" }].concat("");
     let table1 = [
       {
         A: "Name",
@@ -102,13 +109,13 @@ function App() {
         D: "Fee",
       },
     ];
-    data1.forEach((row) => {
+    firstTableData.forEach((row) => {
       table1.push({
         A: row.name,
         B: row.email,
       });
     });
-    data2.forEach((row) => {
+    secondTableData.forEach((row) => {
       table2.push({
         A: row.name,
         B: row.email,
@@ -116,20 +123,33 @@ function App() {
         D: row.fee,
       });
     });
-    let table = [{ A: "Table 1" }]
+    let table = [{ A: "Table Data" }]
       .concat(table1)
       .concat([""])
-      .concat([{ A: "Table 2" }])
       .concat(table2);
+
     let finalData = [...title, ...table];
 
     const wb = XLSX.utils.book_new();
 
-    const sheet = XLSX.utils.json_to_sheet(finalData, {
+    // we will add multiple sheets
+
+    // sheet 1
+    const sheet1 = XLSX.utils.json_to_sheet(finalData, {
       skipHeader: true,
     });
 
-    XLSX.utils.book_append_sheet(wb, sheet, "Report");
+    // sheet 2
+    title = [{ A: "Excel Sheet 2" }].concat("");
+    table = [{ A: "Table Data" }].concat(table2);
+    finalData = [...title, ...table];
+
+    const sheet2 = XLSX.utils.json_to_sheet(finalData, {
+      skipHeader: true,
+    });
+
+    XLSX.utils.book_append_sheet(wb, sheet1, "First Sheet");
+    XLSX.utils.book_append_sheet(wb, sheet2, "Second Sheet");
 
     const workbookBlob = workbook2blob(wb);
 
@@ -137,29 +157,22 @@ function App() {
     finalData.forEach((data, index) =>
       data["A"] === "Name" ? headerIndexes.push(index) : null
     );
-
-    const totalRecords = [...data1, ...data2].length;
-
+    const totalRecords = [...firstTableData, ...secondTableData].length;
     const dataInfo = {
       titleCell: "A2",
       titleRange: "A1:D2",
-      tbodyRange: `A3:D${finalData.length}`,
+      tbodyRange: `A4:D${finalData.length}`,
       theadRange:
         headerIndexes?.length >= 1
-          ? `A${headerIndexes[0] + 1}:D${headerIndexes[0] + 1}`
+          ? `A${headerIndexes[0]}:D${headerIndexes[0]}`
           : null,
       theadRange1:
-        headerIndexes?.length >= 2
-          ? `A${headerIndexes[1] + 1}:D${headerIndexes[1] + 1}`
+        headerIndexes?.length >= 1
+          ? `A${headerIndexes[0] + 1}:D${headerIndexes[0] + 1}`
           : null,
       tFirstColumnRange:
         headerIndexes?.length >= 1
           ? `A${headerIndexes[0] + 1}:A${totalRecords + headerIndexes[0] + 1}`
-          : null,
-
-      tFirstColumnRange1:
-        headerIndexes?.length >= 1
-          ? `A${headerIndexes[1] + 1}:A${totalRecords + headerIndexes[1] + 1}`
           : null,
     };
 
@@ -183,47 +196,21 @@ function App() {
         verticalAlignment: "center",
       });
 
-      if (dataInfo.tbodyRange) {
-        sheet.range(dataInfo.tbodyRange).style({
-          horizontalAlignment: "center",
-        });
-      }
-
-      sheet.range(dataInfo.theadRange).style({
-        fill: "808080",
+      sheet.range(dataInfo.theadRange).merged(true).style({
         bold: true,
         horizontalAlignment: "center",
-        fontColor: "ffffff",
+        verticalAlignment: "center",
       });
 
       sheet.range(dataInfo.theadRange1).style({
-        fill: "808080",
         bold: true,
         horizontalAlignment: "center",
-        fontColor: "ffffff",
+        verticalAlignment: "center",
       });
 
-      if (dataInfo.tFirstColumnRange) {
-        sheet.range(dataInfo.tFirstColumnRange).style({
-          bold: true,
-        });
-      }
-
-      if (dataInfo.tLastColumnRange) {
-        sheet.range(dataInfo.tLastColumnRange).style({
-          bold: true,
-        });
-      }
-
-      if (dataInfo.tFirstColumnRange1) {
-        sheet.range(dataInfo.tFirstColumnRange1).style({
-          bold: true,
-        });
-      }
-
-      if (dataInfo.tLastColumnRange1) {
-        sheet.range(dataInfo.tLastColumnRange1).style({
-          bold: true,
+      if (dataInfo.tbodyRange) {
+        sheet.range(dataInfo.tbodyRange).style({
+          horizontalAlignment: "center",
         });
       }
     });
@@ -257,7 +244,7 @@ function App() {
     await axios({
       url: "http://localhost:9000/doc",
       method: "GET",
-      responseType: "blob", 
+      responseType: "blob",
     })
       .then((response) => {
         const href = URL.createObjectURL(
@@ -271,7 +258,7 @@ function App() {
         document.body.appendChild(a);
         a.click();
         URL.revokeObjectURL(href);
-        a.remove()
+        a.remove();
       })
       .catch((error) => {
         console.log(error);
@@ -284,12 +271,14 @@ function App() {
       <h4 align="center">Export Data to Pdf in Material Table</h4>
       <MaterialTable
         title="Report"
-        columns={columns1}
-        data={data1}
+        columns={firstTableColumns}
+        data={firstTableData}
         actions={[
           {
             icon: () => (
-                <>Export Excel <GridOnIcon /></>
+              <>
+                Export Excel <GridOnIcon />
+              </>
             ),
             tooltip: "Excel",
             onClick: () => downloadExcel(),
@@ -297,7 +286,9 @@ function App() {
           },
           {
             icon: () => (
-                <>PDF <PictureAsPdfIcon /></>
+              <>
+                PDF <PictureAsPdfIcon />
+              </>
             ),
             tooltip: "Export to Pdf",
             onClick: () => downloadPdf(),
@@ -306,7 +297,11 @@ function App() {
         ]}
       />
       <Divider />
-      <MaterialTable title="Report" columns={columns2} data={data2} />
+      <MaterialTable
+        title="Report"
+        columns={secondTableColumns}
+        data={secondTableData}
+      />
 
       <Button
         style={{ cursor: "pointer", margin: "0 auto" }}
