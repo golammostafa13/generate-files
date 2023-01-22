@@ -22,7 +22,6 @@ app.get("/pdf", async (req, res) => {
 });
 
 app.get("/doc", async (req, res) => {
-
   res.setHeader("Content-Disposition", "attachment; filename=My Document.docx");
   res.send(Buffer.from(await b64string, "base64"));
 });

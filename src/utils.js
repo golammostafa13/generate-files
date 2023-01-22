@@ -1,4 +1,4 @@
-export const data1 = [
+export const firstTableData = [
   {
     id: 1,
     name: "Devonna",
@@ -11,7 +11,7 @@ export const data1 = [
   },
 ];
 
-export const data2 = [
+export const secondTableData = [
   {
     id: 1,
     name: "Devonna",
@@ -714,11 +714,11 @@ export const data2 = [
   },
 ];
 
-export const columns1 = [
+export const firstTableColumns = [
   { title: "Name", field: "name" },
   { title: "Email", field: "email" },
 ];
-export const columns2 = [
+export const secondTableColumns = [
   { title: "Name", field: "name" },
   { title: "Email", field: "email" },
   { title: "Year", field: "year", type: "numeric" },
